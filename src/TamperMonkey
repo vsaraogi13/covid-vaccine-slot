@@ -1,0 +1,50 @@
+Tamper Monkey Script
+
+// ==UserScript==
+// @name         New Userscript
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://messages.google.com/web/conversations/85
+// @icon         https://www.google.com/s2/favicons?domain=google.com
+// @grant        none
+// ==/UserScript==
+(function () {
+  'use strict';
+  function getOtp(message) {
+    let match = message.match(/\d{6}/);
+    return match[0];
+  }
+  const lastMessageSelector =
+    'mw-conversation-container mws-messages-list mws-bottom-anchored mws-message-wrapper:last-of-type';
+  function checkNewOtp() {
+    console.log("Starting tamper monkey")
+    const elem = document.querySelector(lastMessageSelector);
+    console.log("Step 2")
+    if (!elem) {
+      return;
+    }
+    console.log("Step 3")
+    const otp = getOtp(elem.innerText);
+    console.log("Step 4")
+    console.log("OTP is:")
+    console.log(otp)
+    const existingOtp = window.localStorage.getItem('otp', null);
+    console.log("OTP is:")
+    console.log(existingOtp)
+    console.log("Step 5")
+    if (existingOtp === otp) {
+      return;
+    }
+    console.log("Step 6")
+    window.localStorage.setItem('otp', otp);
+    console.log("OTP is:")
+    console.log(otp)
+    fetch(`http://localhost:5000/otp?otp=${otp}`, {
+      method: 'POST',
+    }).catch(() => {});
+    console.log("Step 7")
+  }
+  const interval = setInterval(checkNewOtp, 2000);
+})();
